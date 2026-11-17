@@ -1,30 +1,35 @@
+name: Render 2-Minute Prediabetes Explainer
+
 on:
   push:
+    branches: [ main ]
   workflow_dispatch:
-    inputs:
-      titleText:
-        description: "Which text should it say?"
-        required: true
-        default: "Welcome to Remotion"
-      titleColor:
-        description: "Which color should it be in?"
-        required: true
-        default: "black"
-name: Render video
+
 jobs:
   render:
-    name: Render video
-    runs-on: macos-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@main
-      - uses: actions/setup-node@main
-      - run: brew install ffmpeg
-      - run: npm i
-      - run: npm run build -- --props="$WORKFLOW_INPUT"
-        env:
-          WORKFLOW_INPUT: ${{ toJson(github.event.inputs) }}
-      - run: ffmpeg -y -i out.mp4 -i src/voiceover-no-music.mp3 -c:v copy -c:a aac trailer.mp4
-      - uses: actions/upload-artifact@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: trailer.mp4
-          path: trailer.mp4
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chrome dependencies for Remotion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2t64
+
+      - name: Render 2-Minute 1080p MP4
+        run: npm run build
+
+      - name: Upload Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prediabetes-explainer-2min
+          path: out/prediabetes-explainer-2min.mp4
