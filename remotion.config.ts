@@ -1,4 +1,4 @@
-import {Config} from 'remotion';
+import { Config } from '@remotion/cli/config';
 
-Config.Output.setOverwriteOutput(true);
-Config.Bundling.setCachingEnabled(false);
+Config.setVideoImageFormat('jpeg');
+Config.setOverwriteOutput(true);
